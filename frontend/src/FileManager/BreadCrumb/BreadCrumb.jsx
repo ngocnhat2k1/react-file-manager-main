@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { MdHome, MdMoreHoriz, MdOutlineNavigateNext } from "react-icons/md";
 import { useFileNavigation } from "../../contexts/FileNavigationContext";
+import { useFiles } from "../../contexts/FilesContext";
 import { useDetectOutsideClick } from "../../hooks/useDetectOutsideClick";
+import { getParentPath } from "../../utils/getParentPath";
 import "./BreadCrumb.scss";
 
-const BreadCrumb = () => {
+const BreadCrumb = ({onFileOpen}) => {
   const [folders, setFolders] = useState([]);
   const [hiddenFolders, setHiddenFolders] = useState([]);
   const [hiddenFoldersWidth, setHiddenFoldersWidth] = useState([]);
@@ -17,7 +19,7 @@ const BreadCrumb = () => {
   const popoverRef = useDetectOutsideClick(() => {
     setShowHiddenFolders(false);
   });
-
+ const { files:listFile } = useFiles();
   useEffect(() => {
     setFolders(() => {
       let path = "";
@@ -31,9 +33,30 @@ const BreadCrumb = () => {
     setHiddenFolders([]);
     setHiddenFoldersWidth([]);
   }, [currentPath]);
+   const createChildRecursive = (path, foldersStruct) => {
+    if (!foldersStruct[path]) return []; // No children for this path (folder)
+
+    return foldersStruct[path]?.map((folder) => {
+      return {
+        ...folder,
+        subDirectories: createChildRecursive(folder.path, foldersStruct),
+      };
+    });
+  };
 
   const switchPath = (path) => {
     setCurrentPath(path);
+      const folders = listFile.filter((file) => file.isDirectory);
+      // Grouping folders by parent path
+      const foldersStruct = Object.groupBy(folders, ({ path }) => getParentPath(path));
+
+    const listChild =  createChildRecursive(path.replace(/^\/+/, ''), foldersStruct);
+    const curentFolder = listFile?.find((file) => file.path === path.replace(/^\/+/, ''));
+    if (curentFolder?.isDirectory){
+
+      onFileOpen({...curentFolder,subDirectories:listChild});
+       setCurrentPath(curentFolder.path);
+    }
   };
 
   const getBreadCrumbWidth = () => {
@@ -73,7 +96,6 @@ const BreadCrumb = () => {
       setHiddenFoldersWidth((prev) => prev.slice(0, -1));
     }
   }, [isBreadCrumbOverflowing]);
-
   return (
     <div className="bread-crumb-container">
       <div className="breadcrumb" ref={breadCrumbRef}>
