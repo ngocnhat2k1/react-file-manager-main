@@ -10,6 +10,7 @@ import { useSelection } from "../../contexts/SelectionContext";
 import { useClipBoard } from "../../contexts/ClipboardContext";
 import { useLayout } from "../../contexts/LayoutContext";
 import Checkbox from "../../components/Checkbox/Checkbox";
+import FilePreview from "./FilePreview";
 
 const dragIconSize = 50;
 
@@ -25,6 +26,7 @@ const FileItem = ({
   triggerAction,
   handleContextMenu,
   setLastSelectedFile,
+  filePreviewPath,
 }) => {
   const [fileSelected, setFileSelected] = useState(false);
   const [lastClickTime, setLastClickTime] = useState(0);
@@ -37,7 +39,8 @@ const FileItem = ({
   const fileIcons = useFileIcons(iconSize);
   const { setCurrentPath, currentPathFiles } = useFileNavigation();
   const { setSelectedFiles } = useSelection();
-  const { clipBoard, handleCutCopy, setClipBoard, handlePasting } = useClipBoard();
+  const { clipBoard, handleCutCopy, setClipBoard, handlePasting } =
+    useClipBoard();
   const dragIconRef = useRef(null);
   const dragIcons = useFileIcons(dragIconSize);
 
@@ -134,7 +137,9 @@ const FileItem = ({
     if (e.target.checked) {
       setSelectedFiles((prev) => [...prev, file]);
     } else {
-      setSelectedFiles((prev) => prev.filter((f) => f.name !== file.name && f.path !== file.path));
+      setSelectedFiles((prev) =>
+        prev.filter((f) => f.name !== file.name && f.path !== file.path)
+      );
     }
 
     setFileSelected(e.target.checked);
@@ -179,7 +184,9 @@ const FileItem = ({
 
   useEffect(() => {
     setFileSelected(selectedFileIndexes.includes(index));
-    setCheckboxClassName(selectedFileIndexes.includes(index) ? "visible" : "hidden");
+    setCheckboxClassName(
+      selectedFileIndexes.includes(index) ? "visible" : "hidden"
+    );
   }, [selectedFileIndexes]);
 
   return (
@@ -217,7 +224,11 @@ const FileItem = ({
           <FaRegFolderOpen size={iconSize} />
         ) : (
           <>
-            {fileIcons[file.name?.split(".").pop()?.toLowerCase()] ?? <FaRegFile size={iconSize} />}
+            <FilePreview
+              file={file}
+              iconSize={iconSize}
+              filePreviewPath={filePreviewPath}
+            />
           </>
         )}
 
@@ -247,7 +258,9 @@ const FileItem = ({
       {activeLayout === "list" && (
         <>
           <div className="modified-date">{formatDate(file.updatedAt)}</div>
-          <div className="size">{file?.size > 0 ? getDataSize(file?.size) : ""}</div>
+          <div className="size">
+            {file?.size > 0 ? getDataSize(file?.size) : ""}
+          </div>
         </>
       )}
 

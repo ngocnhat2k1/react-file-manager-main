@@ -93,6 +93,7 @@ const FileManager = ({
                       onRefresh={onRefresh}
                       enableFilePreview={enableFilePreview}
                       triggerAction={triggerAction}
+                      filePreviewPath={filePreviewPath}
                     />
                   </div>
                 </section>

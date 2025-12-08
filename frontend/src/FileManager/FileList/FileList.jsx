@@ -15,6 +15,7 @@ const FileList = ({
   onRefresh,
   enableFilePreview,
   triggerAction,
+  filePreviewPath,
 }) => {
   const { currentPathFiles } = useFileNavigation();
   const filesViewRef = useRef(null);
@@ -61,6 +62,7 @@ const FileList = ({
               handleContextMenu={handleContextMenu}
               setVisible={setVisible}
               setLastSelectedFile={setLastSelectedFile}
+              filePreviewPath={filePreviewPath}
             />
           ))}
         </>
