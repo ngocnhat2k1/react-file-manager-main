@@ -27,6 +27,9 @@ An open-source React.js package for easy integration of a file manager into appl
   intuitive keyboard shortcuts.
 - **Drag-and-Drop**: Move selected files and folders by dragging them to the desired directory,
   making file organization effortless.
+- **Smart Search**: Search for files and folders with context-aware results. When inside a folder,
+  search only returns results within that folder's subtree, making it easy to find files in large
+  directory structures.
 
 ![React File Manager](https://github.com/user-attachments/assets/e68f750b-86bf-450d-b27e-fd3dedebf1bd)
 
@@ -150,6 +153,42 @@ type File = {
 | Jump to Last File in the List  | `End`              |
 | Refresh File List              | `F5`               |
 | Clear Selection                | `Esc`              |
+
+## 🔍 Search Feature
+
+The File Manager includes a powerful search feature that helps you quickly find files and folders
+within your directory structure.
+
+### How It Works
+
+- **Context-Aware Search**: When you're inside a folder (e.g., `/Documents/Projects`), the search
+  will only return results from that folder and its subfolders. This prevents overwhelming results
+  and makes it easier to find files in large directory structures.
+
+- **Root-Level Search**: When you're at the root directory, the search will scan all files and
+  folders across the entire file system.
+
+- **Case-Insensitive**: The search is case-insensitive, so you don't need to worry about
+  capitalization when typing your search query.
+
+- **Real-Time Results**: Search results update in real-time as you type, providing instant
+  feedback.
+
+### Usage
+
+Simply type your search query in the search box located in the toolbar. The file list will
+automatically filter to show only matching files and folders based on their name or path.
+
+**Example:**
+- If you're in `/Documents/Projects` and search for "report", you'll only see files/folders
+  containing "report" within that directory and its subfolders.
+- If you're at the root and search for "report", you'll see all files/folders with "report" in
+  their name or path across the entire file system.
+
+### Performance
+
+The search feature is optimized for large datasets (10k-100k+ files) using efficient tree
+traversal algorithms, ensuring fast search results even with extensive directory structures.
 
 ## Custom File Preview
 

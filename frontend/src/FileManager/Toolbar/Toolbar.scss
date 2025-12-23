@@ -86,6 +86,22 @@
     }
   }
 
+  .fm-search {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    font-size: 14px;
+    width: fit-content;
+    border-radius: 4px;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgb(0 0 0 / 10%) !important;
+    }
+  }
+
   .item-action {
     background-color: white;
     display: flex;
