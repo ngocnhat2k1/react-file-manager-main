@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useFiles } from "./FilesContext";
 import { searchInSubtree, getSubtreePaths } from "../utils/treeUtils";
+import { normalizeForSearch } from "../utils/vietnameseUtils";
 import sortFiles from "../utils/sortFiles";
 
 const FileNavigationContext = createContext();
@@ -17,15 +18,18 @@ export const FileNavigationProvider = ({ children, initialPath }) => {
     if (Array.isArray(files) && files.length > 0) {
       // When searching, only search within current folder's subtree
       if (searchTerm.trim()) {
-        const query = searchTerm.trim().toLowerCase();
+        const query = normalizeForSearch(searchTerm.trim());
 
         // If at root (currentPath is empty), search entire flat list
         if (!currentPath) {
-          const matchedFiles = files.filter(
-            (file) =>
-              file.path.toLowerCase().includes(query) ||
-              file.name.toLowerCase().includes(query)
-          );
+          const matchedFiles = files.filter((file) => {
+            // Normalize both path and name for comparison (supports Vietnamese without diacritics)
+            const normalizedPath = normalizeForSearch(file.path || "");
+            const normalizedName = normalizeForSearch(file.name || "");
+            return (
+              normalizedPath.includes(query) || normalizedName.includes(query)
+            );
+          });
           setCurrentPathFiles(() => sortFiles(matchedFiles));
           setCurrentFolder(null);
           return;

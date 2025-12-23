@@ -1,9 +1,10 @@
 import { getParentPath } from "./getParentPath";
+import { normalizeForSearch } from "./vietnameseUtils";
 
 /**
  * Builds a tree structure from a flat list of files/folders
  * Time complexity: O(n) where n is the number of files
- * 
+ *
  * @param {Array} flatList - Flat array of file objects with {name, path, isDirectory, ...}
  * @returns {Array} Array of root nodes with children property
  */
@@ -48,7 +49,7 @@ export const buildTree = (flatList) => {
 /**
  * Finds a node in the tree by its path
  * Time complexity: O(n) worst case, but optimized with path-based lookup
- * 
+ *
  * @param {Array} tree - Tree structure (array of root nodes)
  * @param {string} targetPath - Path to find
  * @returns {Object|null} Found node or null
@@ -60,7 +61,7 @@ export const findNodeByPath = (tree, targetPath) => {
 
   // Direct lookup using path segments for better performance
   const pathSegments = targetPath.split("/").filter(Boolean);
-  
+
   if (pathSegments.length === 0) {
     return null;
   }
@@ -103,7 +104,7 @@ export const findNodeByPath = (tree, targetPath) => {
 /**
  * Searches for files/folders within a subtree that match the keyword
  * Time complexity: O(m) where m is the number of nodes in the subtree
- * 
+ *
  * @param {Object} node - Root node of the subtree to search
  * @param {string} keyword - Search keyword (case-insensitive)
  * @param {Array} flatList - Flat list for fast filtering (optional, for optimization)
@@ -114,7 +115,7 @@ export const searchInSubtree = (node, keyword, flatList = null) => {
     return [];
   }
 
-  const query = keyword.trim().toLowerCase();
+  const query = normalizeForSearch(keyword.trim());
   if (!query) {
     return [];
   }
@@ -125,9 +126,13 @@ export const searchInSubtree = (node, keyword, flatList = null) => {
   const searchRecursive = (currentNode) => {
     if (!currentNode) return;
 
-    // Check if current node matches
-    const pathMatch = currentNode.path?.toLowerCase().includes(query);
-    const nameMatch = currentNode.name?.toLowerCase().includes(query);
+    // Normalize both path and name for comparison (supports Vietnamese without diacritics)
+    const normalizedPath = normalizeForSearch(currentNode.path || "");
+    const normalizedName = normalizeForSearch(currentNode.name || "");
+
+    // Check if current node matches (supports both with and without diacritics)
+    const pathMatch = normalizedPath.includes(query);
+    const nameMatch = normalizedName.includes(query);
 
     if (pathMatch || nameMatch) {
       results.push({
@@ -154,7 +159,7 @@ export const searchInSubtree = (node, keyword, flatList = null) => {
 /**
  * Gets all descendant paths from a given node (for fast flat list filtering)
  * Time complexity: O(m) where m is the number of descendants
- * 
+ *
  * @param {Object} node - Root node
  * @returns {Set} Set of all descendant paths including the node itself
  */
@@ -177,4 +182,3 @@ export const getSubtreePaths = (node) => {
   collectPaths(node);
   return paths;
 };
-
